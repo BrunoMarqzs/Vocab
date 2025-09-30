@@ -1,0 +1,37 @@
+# @title Função de coleta de palavras de 6 letras 
+
+
+import requests
+import time
+
+def buscar_palavra_6_letras():
+    url = "https://api.dicionario-aberto.net/random"
+    
+   
+    tentativas = 0
+    while tentativas < 50:  # Evitar loop infinito
+        resposta = requests.get(url)
+        
+        if resposta.status_code == 200:
+            dados = resposta.json()
+            palavra = dados["word"]
+            
+            if len(palavra) == 6:
+                return palavra
+        
+        tentativas += 1
+        time.sleep(0.1)  # Pausa para não sobrecarregar o servidor da API
+    
+    return None  # Retorna None se não encontrar após várias tentativas
+
+# Uso
+palavra = buscar_palavra_6_letras()
+# print(palavra)
+
+if palavra:
+    print("Palavra de 6 letras:", palavra)
+else:
+    print("Não foi possível encontrar uma palavra de 6 letras")
+
+
+## É a API o dicionário aberto que é gratuita e cumpre perfeitamente o que precisamos para desenvolver o MVP a priori 
