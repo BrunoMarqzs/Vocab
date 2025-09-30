@@ -26,6 +26,8 @@ def buscar_palavra_6_letras():
 
 # Uso
 palavra = buscar_palavra_6_letras()
+# print(palavra)
+
 if palavra:
     print("Palavra de 6 letras:", palavra)
 else:

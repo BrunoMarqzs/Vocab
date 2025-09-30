@@ -51,3 +51,17 @@ class VocabGame:
             'tabuleiro': self.tabuleiro.copy(),
             'status': self.status
         }
+
+
+    def finalizar_jogo(self, palpite):
+
+        if self.tentativas_restantes <= 0:
+            self.status = 'perdeu'
+
+        elif self.palavra_secreta == palpite:
+            self.status = 'venceu'
+
+        print("VOCÊ ACERTOU A PALAVRA!" if self.status == 'venceu' else "VOCÊ ERROU A PALAVRA!")
+        # mostra a palara secreta se errou
+        print(f"A palavra correta era: {self.palavra_secreta}" if self.status == 'perdeu' else "")
+        print(self.obter_estado_jogo())
