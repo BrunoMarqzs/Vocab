@@ -59,3 +59,33 @@ class TestVocabGame:
         assert estado['tabuleiro'] == []
         assert estado['status'] == 'em_andamento'
         assert 'palavra_secreta' not in estado
+
+    def test_nao_pode_iniciar_nova_partida_sem_finalizar():
+        """Teste para o UC-7"""
+
+        jogo = VocabGame()
+        jogo.iniciar_jogo()
+        # ainda em andamento → deve rejeitar
+        with pytest.raises(ValueError):
+            jogo.iniciar_nova_partida()
+
+
+    def test_iniciar_nova_partida_reseta_estado(monkeypatch):
+        """Teste para o UC-7"""
+
+        jogo = VocabGame()
+
+        # Força palavras previsíveis para testarmos troca entre partidas
+        monkeypatch.setattr(VocabGame, "_sortear_palavra_5_letras", lambda self: "VIDAS")
+        jogo.iniciar_jogo()
+        # Simula o fim da partida (vitória/derrota tanto faz para este UC)
+        jogo.finalizar_partida(resultado="derrota")
+
+        # Para a nova partida, força uma segunda palavra
+        monkeypatch.setattr(VocabGame, "_sortear_palavra_5_letras", lambda self: "MILHO")
+        jogo.iniciar_nova_partida()
+
+        assert jogo.status == "em_andamento"
+        assert jogo.tentativas_restantes == 6
+        assert jogo.tabuleiro == []
+        assert jogo.palavra_secreta == "MILHO"  # nova palavra definida

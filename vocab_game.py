@@ -15,6 +15,26 @@ class VocabGame:
         self.tentativas_restantes = 6
         self.tabuleiro = []
         self.status = 'em_andamento'
+
+    def iniciar_nova_partida(self):
+        """
+        UC-04: só pode iniciar nova partida se a anterior foi finalizada.
+        Reinicia tentativas, tabuleiro e sorteia nova palavra.
+        """
+        if self.status != 'finalizado':
+            raise ValueError("Nova partida só pode ser iniciada após finalizar a partida anterior.")
+        # reinicia como um novo jogo
+        self.palavra_secreta = self._sortear_palavra_5_letras()
+        self.tentativas_restantes = 6
+        self.tabuleiro = []
+        self.status = 'em_andamento'
+
+    def finalizar_partida(self, resultado: str):
+        """
+        Marca a partida como finalizada.
+        `resultado` pode ser 'vitoria', 'derrota' etc. (por ora não usamos).
+        """
+        self.status = 'finalizado'
     
     def _sortear_palavra_5_letras(self):
         # Sorteia uma palavra de 5 letras usando a API do dicionário aberto.
