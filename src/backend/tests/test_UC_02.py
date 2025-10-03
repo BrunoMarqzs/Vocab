@@ -33,7 +33,7 @@ class TestVocabGameUC02:
         
         # Simular tentativa com a palavra secreta (vitória)
         palavra_secreta = jogo.palavra_secreta
-        resultado = jogo.fazer_tentativa(palavra_secreta)
+        resultado = jogo.inserir_tentativa(palavra_secreta)
         
         assert resultado['acertou'] == True
         assert jogo.status == 'vitoria'
@@ -49,7 +49,7 @@ class TestVocabGameUC02:
         if tentativa == jogo.palavra_secreta:
             tentativa = "JOGAR"  # Fallback
             
-        resultado = jogo.fazer_tentativa(tentativa)
+        resultado = jogo.inserir_tentativa(tentativa)
         
         assert resultado['acertou'] == False
         assert jogo.status == 'em_andamento'

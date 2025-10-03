@@ -79,8 +79,8 @@ class TestVocabGame:
         primeira_palavra = jogo.palavra_secreta
         
         # Simular algumas jogadas
-        jogo.fazer_tentativa("TESTE")
-        jogo.fazer_tentativa("JOGOS")
+        jogo.inserir_tentativa("TESTE")
+        jogo.inserir_tentativa("JOGOS")
         
         # Finalizar a partida atual (forçar derrota)
         jogo.tentativas_restantes = 0
