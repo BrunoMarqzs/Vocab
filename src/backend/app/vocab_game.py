@@ -85,20 +85,20 @@ class VocabGame:
         }
     
     def analisar_palpite(self, palpite):
-    #UC-03: Receber Feedback da Tentativa 
-    palpite = palpite.upper()
-    resultado = []
+        # UC-03: Receber Feedback da Tentativa
+        palpite = palpite.upper()
+        resultado = []
     
-    for i in range(5):
-        letra = palpite[i]
-        if letra == self.palavra_secreta[i]:
-            resultado.append({'letra': letra, 'status': 'correto'})
-        elif letra in self.palavra_secreta:
-            resultado.append({'letra': letra, 'status': 'posicao_errada'})
-        else:
-            resultado.append({'letra': letra, 'status': 'inexistente'})
-    
-    return resultado
+        for i in range(5):
+            letra = palpite[i]
+            if letra == self.palavra_secreta[i]:
+                resultado.append({'letra': letra, 'status': 'correto'})
+            elif letra in self.palavra_secreta:
+                resultado.append({'letra': letra, 'status': 'posicao_errada'})
+            else:
+                resultado.append({'letra': letra, 'status': 'inexistente'})
+        
+        return resultado
 
 
     def finalizar_jogo(self, palpite):
