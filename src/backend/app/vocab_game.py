@@ -12,7 +12,7 @@ class VocabGame:
     
     def iniciar_jogo(self):
         self.palavra_secreta = self._sortear_palavra_5_letras()
-        self.tentativas_restantes = 6
+        self.tentativas_restantes = 5
         self.tabuleiro = []
         self.status = 'em_andamento'
 
@@ -63,6 +63,18 @@ class VocabGame:
         # Fallback: se não conseguir da API, usa uma palavra padrão
         palavras_fallback = ["MUNDO", "TEMPO", "PESSOA", "LUGAR"]
         return random.choice(palavras_fallback)
+    
+    def inserir_tentativa(self, palavra):
+        """ UC-02 """
+        # 1. Validar se tem 5 letras
+        if len(palavra) != 5:
+            return False
+        
+        # 2. Validar se são apenas letras
+        if not palavra.isalpha():
+            return False
+        
+        return True
     
     def obter_estado_jogo(self):
         # Retorna o estado atual do jogo visível ao jogador sem incluir a palavra secreta.

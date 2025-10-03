@@ -14,21 +14,21 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file first (for better Docker layer caching)
-COPY requirements.txt .
+COPY src/backend/requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
-COPY . .
+# Copy backend source code
+COPY src/backend/ .
 
 # Create a non-root user for security
 RUN useradd --create-home --shell /bin/bash app \
     && chown -R app:app /app
 USER app
 
-# Expose port (if needed for future web interface)
-EXPOSE 8000
+# Set Python path
+ENV PYTHONPATH=/app
 
-# Default command to run the game
-CMD ["python", "main.py"]
+# Default command for running tests
+CMD ["python", "-m", "pytest", "tests/", "-v"]

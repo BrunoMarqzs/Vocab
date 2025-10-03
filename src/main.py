@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from vocab_game import VocabGame
+from backend.app.vocab_game import VocabGame
 
 
 def main():
