@@ -1,4 +1,4 @@
-from src.vocab_game import VocabGame
+from backend.app.vocab_game import VocabGame
 
 def test_feedback_correto():
     jogo = VocabGame()

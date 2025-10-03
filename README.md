@@ -21,7 +21,7 @@ docker-compose build
 # Executar o jogo
 docker-compose run --rm vocab-game
 
-# Executar os testes
+# Executar os testes com Pytest
 docker-compose run --rm vocab-tests
 ```
 
@@ -32,8 +32,13 @@ docker-compose run --rm vocab-tests
 2. Instalar as dependências:
 
 ```bash
+# Para instalar as dependências (apenas uma vez)
 pip install -r requirements.txt
-python main.py
+# Para rodar a função main
+python src/main.py
+# Para rodar os testes
+PYTHONPATH=src python -m pytest src/backend/tests -v
+
 ```
 
 ## Desenvolvimento
