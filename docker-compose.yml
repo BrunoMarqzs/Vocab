@@ -1,0 +1,22 @@
+services:
+  vocab-game:
+    build: .
+    container_name: vocab-game
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    command: python main.py
+    
+  vocab-tests:
+    build: .
+    container_name: vocab-tests
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    command: pytest tests/ -v

@@ -2,72 +2,38 @@
 
 ## Descrição
 
-O **Vocab** é um jogo de adivinhação de palavras secretas inspirado no Wordle. O objetivo é descobrir uma palavra de 5 letras em até 6 tentativas.
-
-### Regras do Jogo
-
-1. Cada palavra enviada deve ter cinco letras e estar presente no dicionário do jogo
-2. O jogador possui 6 tentativas para adivinhar a palavra da partida
-3. Após cada tentativa:
-   - **Verde**: Letra correta na posição correta
-   - **Amarelo**: Letra existe na palavra mas está em posição diferente
-   - **Sem destaque**: Letra não faz parte da palavra sorteada
-
-### Pontuação
-
-- **Vitória**: Acertar todas as letras nas posições corretas
-- **Derrota**: Esgotar as 6 tentativas sem acertar
-- **Pontuação parcial**: Na última tentativa, pontos equivalentes aos acertos
+O **Vocab** é um jogo de adivinhação de palavras secretas inspirado no Wordle. O objetivo é descobrir uma palavra de 5 letras em até cinco tentativas.
 
 ## Como Executar
 
-### Pré-requisitos
+### Opção 1: Usando Docker (Recomendado)
 
+#### Pré-requisitos
+- Docker
+- Docker Compose
+
+#### Comandos Docker
+
+```bash
+# Construir as imagens primeiro
+docker-compose build
+
+# Executar o jogo
+docker-compose run --rm vocab-game
+
+# Executar os testes
+docker-compose run --rm vocab-tests
+```
+
+### Opção 2: Instalação Local
+
+#### Pré-requisitos
 1. Python 3.7 ou superior
 2. Instalar as dependências:
 
 ```bash
-pip install pytest requests
-```
-
-### Executar os Testes
-
-Para executar todos os testes do projeto:
-
-```bash
-# Executar todos os testes
-pytest
-
-# Executar com saída detalhada
-pytest -v
-
-# Executar apenas testes específicos
-pytest tests/test_vocab_game.py
-```
-
-### Executar o Jogo
-
-Para testar o jogo em funcionamento:
-
-```bash
+pip install -r requirements.txt
 python main.py
-```
-
-### Usar o Jogo (Programaticamente)
-
-```python
-from vocab_game import VocabGame
-
-# Criar uma nova instância do jogo
-jogo = VocabGame()
-
-# Iniciar uma partida
-jogo.iniciar_jogo()
-
-# Obter o estado atual do jogo
-estado = jogo.obter_estado_jogo()
-print(f"Tentativas restantes: {estado['tentativas_restantes']}")
-print(f"Status: {estado['status']}")
 ```
 
 ## Desenvolvimento
@@ -81,7 +47,6 @@ Este projeto segue a metodologia **TDD (Test-Driven Development)**:
 ## Casos de Uso Implementados
 
 - [x] **UC-01**: Iniciar Jogo - Sorteia palavra secreta e configura estado inicial
-
 
 ## API Utilizada
 
