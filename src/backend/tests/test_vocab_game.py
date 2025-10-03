@@ -18,11 +18,11 @@ class TestVocabGame:
         assert jogo.palavra_secreta.isupper()
     
     def test_iniciar_tentativas_restantes(self):
-        """Teste 3: O jogo deve iniciar com 6 tentativas"""
+        """Teste 3: O jogo deve iniciar com 5 tentativas"""
         jogo = VocabGame()
         jogo.iniciar_jogo()
         
-        assert jogo.tentativas_restantes == 6
+        assert jogo.tentativas_restantes == 5
     
     def test_iniciar_tabuleiro_vazio(self):
         """Teste 4: O jogo deve inicializar com tabuleiro vazio"""
