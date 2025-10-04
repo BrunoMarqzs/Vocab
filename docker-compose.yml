@@ -1,0 +1,28 @@
+services:
+  vocab-game:
+    build: 
+      context: .
+      dockerfile: src/backend/Dockerfile
+    container_name: vocab-game
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/src:/app
+    command: python src/main.py
+    
+  vocab-tests:
+    build:
+      context: .
+      dockerfile: src/backend/Dockerfile
+    container_name: vocab-tests
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/src:/app
+    command: python -m pytest src/backend/tests/ -v
