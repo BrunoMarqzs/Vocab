@@ -99,3 +99,17 @@ class TestVocabGame:
         assert jogo.tentativas_restantes == 6
         assert jogo.tabuleiro == []
         assert jogo.status == 'em_andamento'
+    
+    def test_obter_estado_jogo_v2(self):
+        """Teste 6: O método obter_estado_jogo deve retornar todas as informações necessárias"""
+        jogo = VocabGame()
+        jogo.iniciar_jogo()
+
+        estado = jogo.obter_estado_jogo()
+
+        assert 'tentativas_restantes' in estado
+        assert 'tabuleiro' in estado
+        assert 'status' in estado
+        assert 'tentativas_restantes' in estado
+        assert 'tabuleiro' in estado
+        assert 'status' in estado
