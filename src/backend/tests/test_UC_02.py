@@ -38,6 +38,16 @@ class TestVocabGameUC02:
         assert resultado['acertou'] == True
         assert jogo.status == 'vitoria'
         assert len(jogo.tabuleiro) == 1
+           
+    def test_fazer_tentativa_palavra_correta_v2(self):
+        jogo = VocabGame()
+        jogo.iniciar_jogo()
+
+    # Simular tentativa com a palavra secreta (vitória)
+        palavra_secreta = jogo.palavra_secreta
+        acertou = jogo.inserir_tentativa(palavra_secreta)
+
+        assert acertou == True
         
     def test_fazer_tentativa_palavra_incorreta(self):
         """Teste UC-02.2: Fazer tentativa com palavra incorreta"""
