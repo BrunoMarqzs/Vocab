@@ -191,8 +191,16 @@ export default function App() {
 
   const statusMensagem = useMemo(() => {
     if (!estado) return "";
-    if (estado.status === "venceu") return "🎉 Você acertou!";
-    if (estado.status === "perdeu") return "💀 Fim de jogo. Tente outra vez.";
+    if (estado.status === "venceu") {
+      return estado.palavra_secreta 
+        ? `🎉 Você acertou! A palavra era: ${estado.palavra_secreta}`
+        : "🎉 Você acertou!";
+    }
+    if (estado.status === "perdeu") {
+      return estado.palavra_secreta 
+        ? `💀 Fim de jogo. A palavra era: ${estado.palavra_secreta}`
+        : "💀 Fim de jogo. Tente outra vez.";
+    }
     return `Tentativas restantes: ${estado.tentativas_restantes ?? "-"}`;
   }, [estado]);
 

@@ -183,11 +183,18 @@ class VocabGame:
         elif self.tentativas_restantes <= 0:
             self.status = 'perdeu'
         
-        return {
+        # Prepara resposta
+        resposta = {
             "feedback": feedback,
             "tentativas_restantes": self.tentativas_restantes,
             "status": self.status
         }
+        
+        # Inclui palavra secreta quando o jogo termina (perdeu ou venceu)
+        if self.status in ['venceu', 'perdeu']:
+            resposta["palavra_secreta"] = self.palavra_secreta
+        
+        return resposta
 
 
     def finalizar_jogo(self, palpite):
