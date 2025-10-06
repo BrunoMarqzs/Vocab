@@ -33,8 +33,9 @@ def health():
 
 @app.post("/api/iniciar")
 def iniciar():
-    est = game.iniciar_jogo()
-    return est if isinstance(est, dict) else game.obter_estado_jogo()
+    """Inicia ou reinicia um jogo"""
+    game.forcar_novo_jogo()
+    return game.obter_estado_jogo()
 
 @app.get("/api/estado")
 def estado():
@@ -47,5 +48,6 @@ def palpite(data: Palpite):
 
 @app.post("/api/nova-partida")
 def nova_partida():
-    est = game.iniciar_jogo()
-    return est if isinstance(est, dict) else game.obter_estado_jogo()
+    """Força uma nova partida independente do status atual"""
+    game.forcar_novo_jogo()
+    return game.obter_estado_jogo()

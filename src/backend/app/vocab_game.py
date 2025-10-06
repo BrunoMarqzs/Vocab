@@ -20,6 +20,17 @@ class VocabGame:
         self.tabuleiro = []
         self.status = 'em_andamento'
         return True
+    
+    def forcar_novo_jogo(self):
+        """
+        Força o início de um novo jogo, independente do status atual.
+        Usado para 'Nova Partida' e 'Reiniciar'.
+        """
+        self.palavra_secreta = self._sortear_palavra_5_letras()
+        self.tentativas_restantes = 5
+        self.tabuleiro = []
+        self.status = 'em_andamento'
+        return True
 
     def iniciar_nova_partida(self):
         """
