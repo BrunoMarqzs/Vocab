@@ -11,10 +11,15 @@ class VocabGame:
         self.status = None
     
     def iniciar_jogo(self):
+        # Não permite iniciar nova partida se a atual não foi finalizada
+        if self.status == 'em_andamento':
+            return False
+            
         self.palavra_secreta = self._sortear_palavra_5_letras()
         self.tentativas_restantes = 5
         self.tabuleiro = []
         self.status = 'em_andamento'
+        return True
 
     def iniciar_nova_partida(self):
         """
@@ -28,6 +33,7 @@ class VocabGame:
         self.tentativas_restantes = 6
         self.tabuleiro = []
         self.status = 'em_andamento'
+        return True
 
     def finalizar_partida(self, resultado: str):
         """
@@ -61,11 +67,11 @@ class VocabGame:
                 time.sleep(0.1)
         
         # Fallback: se não conseguir da API, usa uma palavra padrão
-        palavras_fallback = ["MUNDO", "TEMPO", "PESSOA", "LUGAR"]
+        palavras_fallback = ["MUNDO", "TEMPO", "JOGO", "LUGAR"]
         return random.choice(palavras_fallback)
     
-    def inserir_tentativa(self, palavra):
-        """ UC-02 """
+    def validar_palavra(self, palavra):
+        """ Método para validação simples de palavra - retorna True/False """
         # 1. Validar se tem 5 letras
         if len(palavra) != 5:
             return False
@@ -75,14 +81,56 @@ class VocabGame:
             return False
         
         return True
+
+    def inserir_tentativa(self, palavra):
+        """ UC-02 - Inserir tentativa completa no jogo """
+        # 0. Verificar se o jogo foi iniciado
+        if self.palavra_secreta is None or self.status != 'em_andamento':
+            return {'acertou': False, 'erro': 'Jogo não foi iniciado ou já foi finalizado'}
+        
+        # 1. Usar validação simples primeiro
+        if not self.validar_palavra(palavra):
+            if len(palavra) != 5:
+                return {'acertou': False, 'erro': 'Palavra deve ter 5 letras'}
+            else:
+                return {'acertou': False, 'erro': 'Palavra deve conter apenas letras'}
+        
+        # 2. Verificar se acertou a palavra
+        palavra = palavra.upper()
+        acertou = palavra == self.palavra_secreta
+        
+        # 3. Processar tentativa
+        feedback = self.analisar_palpite(palavra)
+        self.tabuleiro.append({
+            'palavra': palavra,
+            'feedback': feedback
+        })
+        
+        # 4. Reduzir tentativas restantes
+        if not acertou:
+            self.tentativas_restantes -= 1
+        
+        # 5. Verificar se o jogo terminou
+        if acertou:
+            self.status = 'venceu'
+        elif self.tentativas_restantes <= 0:
+            self.status = 'perdeu'
+        
+        return {'acertou': acertou, 'feedback': feedback}
     
-    def obter_estado_jogo(self):
-        # Retorna o estado atual do jogo visível ao jogador sem incluir a palavra secreta.
-        return {
+    def obter_estado_jogo(self, incluir_palavra_secreta=False):
+        # Retorna o estado atual do jogo visível ao jogador
+        estado = {
             'tentativas_restantes': self.tentativas_restantes,
             'tabuleiro': self.tabuleiro.copy(),
             'status': self.status
         }
+        
+        # Incluir palavra secreta apenas quando solicitado (para testes ou quando o jogo terminou)
+        if incluir_palavra_secreta or self.status in ['venceu', 'perdeu']:
+            estado['palavra_secreta'] = self.palavra_secreta
+            
+        return estado
     
     def analisar_palpite(self, palpite):
         # UC-03: Receber Feedback da Tentativa

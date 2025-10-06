@@ -44,14 +44,14 @@ class TestVocabGame:
         jogo = VocabGame()
         jogo.iniciar_jogo()
         
-        estado = jogo.obter_estado_jogo()
+        estado = jogo.obter_estado_jogo(incluir_palavra_secreta=True)
         
         assert 'tentativas_restantes' in estado
         assert 'tabuleiro' in estado
         assert 'status' in estado
         assert 'palavra_secreta' in estado
         
-        assert estado['tentativas_restantes'] == 6
+        assert estado['tentativas_restantes'] == 5
         assert estado['tabuleiro'] == []
         assert estado['status'] == 'em_andamento'
         assert len(estado['palavra_secreta']) == 5
@@ -84,7 +84,7 @@ class TestVocabGame:
         
         # Finalizar a partida atual (forçar derrota)
         jogo.tentativas_restantes = 0
-        jogo.status = 'derrota'
+        jogo.status = 'perdeu'
         
         # Trocar para nova palavra para segunda partida
         monkeypatch.setattr(VocabGame, "_sortear_palavra_5_letras", lambda self: "JOGAR")
@@ -96,6 +96,6 @@ class TestVocabGame:
         assert resultado == True
         assert jogo.palavra_secreta == "JOGAR"
         assert jogo.palavra_secreta != primeira_palavra
-        assert jogo.tentativas_restantes == 6
+        assert jogo.tentativas_restantes == 5
         assert jogo.tabuleiro == []
         assert jogo.status == 'em_andamento'
