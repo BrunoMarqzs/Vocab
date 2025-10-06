@@ -4,77 +4,100 @@
 
 O **Vocab** é um jogo de adivinhação de palavras secretas inspirado no Wordle. O objetivo é descobrir uma palavra de 5 letras em até cinco tentativas.
 
-## Como Executar
+## Pré-requisitos
 
-### Opção 1: Usando Docker (Recomendado)
+### Instalação Local
+- Python 3.7+ 
+- Node.js 18+
+- npm 8+
 
-#### Pré-requisitos
+### Docker
 - Docker
 - Docker Compose
 
-#### Comandos Docker
+## Instalação de Dependências
 
 ```bash
-# Construir as imagens primeiro
-docker-compose build
+# Backend
+pip install fastapi uvicorn requests
 
-# Executar o jogo
-docker-compose run --rm vocab-game
+# Frontend
+cd src/frontend
+npm install
+```
 
-# Executar os testes com Pytest
+## Como Executar
+
+### Opção 1: Execução Local (Recomendado)
+
+```bash
+# 1. Backend (Terminal 1)
+cd src/backend/app
+uvicorn api:app --reload --host 127.0.0.1 --port 8000
+
+# 2. Frontend (Terminal 2) 
+cd src/frontend
+npm run dev
+```
+
+### Opção 2: Usando Docker
+
+```bash
+# Aplicação completa
+docker-compose up backend frontend-dev
+
+# Apenas testes
 docker-compose run --rm vocab-tests
 ```
 
-### Opção 2: Instalação Local
+## Acessar a Aplicação
 
-#### Pré-requisitos
-1. Python 3.7 ou superior
-2. Instalar as dependências:
+- **Jogo**: http://localhost:3000
+- **API**: http://localhost:8000/docs
+
+## Executar Testes
 
 ```bash
-# Para instalar as dependências (apenas uma vez)
-pip install -r requirements.txt
-# Para rodar a função main
-python src/main.py
-# Para rodar os testes
+# Navegar para a raiz do projeto
+cd Vocab
+
+# Executar todos os testes
 PYTHONPATH=src python -m pytest src/backend/tests -v
 
+# Executar teste específico
+PYTHONPATH=src python -m pytest src/backend/tests/test_uc_01.py -v
 ```
 
-## executar frontend
+## Desenvolvimento e Testes
 
-### Pré-requisitos
-- Node.js 18+ e npm
-- Backend FastAPI rodando em `http://127.0.0.1:8000`
+### Casos de Uso com TDD
+- ✅ UC-01: Iniciar Jogo (`test_uc_01.py`)  
+- ✅ UC-02: Inserir Tentativa (`test_uc_02.py`)
+- ✅ UC-03: Finalizar Partida (`test_uc_03_finalizar.py`)
+- ✅ UC-04: Iniciar Nova Partida (`test_uc_04.py`)
+- ✅ UC-05: Compartilhar Resultado (`test_uc_05.py`)
+- ✅ UC-06: Consultar Estatísticas (`test_uc_06.py`)
+
+### Tecnologias
+- **Backend**: Python + FastAPI + Uvicorn
+- **Frontend**: React + Vite + Tailwind CSS
+- **Testes**: Pytest com metodologia TDD
+- **API Externa**: [Dicionário Aberto](https://dicionario-aberto.net/)
+
+## Troubleshooting
+
+### Problemas Comuns
+
+**Frontend mostra tela branca ou erros de conexão:**
+1. Certifique-se que o backend está rodando primeiro
+2. Use `127.0.0.1:8000` em vez de `localhost:8000` se houver problemas IPv6
+3. Verifique se as portas 8000 (backend) e 3000 (frontend) estão livres
+
+**Dependências não encontradas:**
 ```bash
-cd src/backend/app
+# Se faltar uvicorn/fastapi
+pip install fastapi uvicorn requests
 
-uvicorn api:app --reload
-
- ```
-
-
-```bash
-cd src/frontend/termo
-
-npm install
-
-npm start
-
+# Se faltar dependências do Node.js  
+cd src/frontend && npm install
 ```
-
-## Desenvolvimento
-
-Este projeto segue a metodologia **TDD (Test-Driven Development)**:
-
-1. Escrever os testes primeiro
-2. Implementar o código mínimo para passar nos testes
-3. Refatorar mantendo os testes passando
-
-## Casos de Uso Implementados
-
-- [x] **UC-01**: Iniciar Jogo - Sorteia palavra secreta e configura estado inicial
-
-## API Utilizada
-
-O jogo utiliza a [API do Dicionário Aberto](https://dicionario-aberto.net/) para obter palavras aleatórias em português.

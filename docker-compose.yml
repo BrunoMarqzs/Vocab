@@ -1,4 +1,5 @@
 services:
+  # Backend services
   vocab-game:
     build: 
       context: .
@@ -26,3 +27,48 @@ services:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/app/src:/app
     command: python -m pytest src/backend/tests/ -v
+
+  # Backend API server
+  backend:
+    build:
+      context: .
+      dockerfile: src/backend/Dockerfile
+    container_name: vocab-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/src:/app
+    command: uvicorn backend.app.api:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend services
+  frontend-dev:
+    build:
+      context: src/frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: vocab-frontend-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+
+  frontend-prod:
+    build:
+      context: src/frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: vocab-frontend-prod
+    ports:
+      - "80:80"
+    depends_on:
+      - backend

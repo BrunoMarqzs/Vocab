@@ -1,9 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 /**
- * TERMO (Wordle PT) — Frontend SPA
+ * VOCAB — Frontend SPA
  * -------------------------------------------------------
- * ✔ Single-file React component (use as your App.tsx/App.jsx)
+ * ✔ Single-file React componen  //   // cria "linhas vazias" para completar o grid visual com 5 tentativasria "linhas vazias" para completar o grid visual com 5 tentativas
+  const linhasCompletas = useMemo(() => {
+    const faltam = Math.max(0, MAX_TENTATIVAS - linhas.length);
+    const vazia = Array.from({ length: MAX_COLS }, () => ({ letra: "", status: "vazia" }));
+    return [...linhas, ...Array.from({ length: faltam }, () => vazia)];
+  }, [linhas]);.jsx)
  * ✔ Tailwind-only styling (no external UI libs)
  * ✔ Clean, keyboard-friendly UX (Enter/Backspace)
  * ✔ Works against a minimal REST API (spec below)
@@ -25,38 +30,33 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
  * Se quiser, você pode trocar o API_BASE para apontar pro seu backend local (ex.: http://localhost:8000).
  */
 
-const API_BASE = typeof window !== "undefined" && (window as any).__TERMO_API__
-  ? (window as any).__TERMO_API__
+const API_BASE = typeof window !== "undefined" && window.__TERMO_API__
+  ? window.__TERMO_API__
   : "/api"; // mude para o host do seu backend se necessário
 
 const MAX_COLS = 5;           // 5 letras por palavra
-const MAX_TENTATIVAS = 6;     // exibição (o backend devolve o valor real)
+const MAX_TENTATIVAS = 5;     // exibição (o backend devolve o valor real)
 
-type Celula = { letra: string; status: "correto" | "posicao_errada" | "inexistente" | "vazia" };
-
-type FeedbackItem = { letra: string; status: "correto" | "posicao_errada" | "inexistente" };
-
-type EstadoJogo = {
-  tentativas_restantes: number;
-  tabuleiro: FeedbackItem[][] | [];
-  status: "em_andamento" | "venceu" | "perdeu" | "finalizado" | string;
-};
+// Tipos para referência (remover se usar JSDoc):
+// Celula = { letra: string; status: "correto" | "posicao_errada" | "inexistente" | "vazia" }
+// FeedbackItem = { letra: string; status: "correto" | "posicao_errada" | "inexistente" }
+// EstadoJogo = { tentativas_restantes: number; tabuleiro: FeedbackItem[][] | [], status: string }
 
 export default function App() {
-  const [estado, setEstado] = useState<EstadoJogo | null>(null);
-  const [linhas, setLinhas] = useState<Celula[][]>([]); // histórico avaliado
-  const [linhaAtual, setLinhaAtual] = useState<string>("");
-  const [erro, setErro] = useState<string>("");
-  const [carregando, setCarregando] = useState<boolean>(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [estado, setEstado] = useState(null);
+  const [linhas, setLinhas] = useState([]); // histórico avaliado
+  const [linhaAtual, setLinhaAtual] = useState("");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
+  const inputRef = useRef(null);
 
   // -------------------------------------------------------
   // Helpers
   // -------------------------------------------------------
-  const normaliza = (s: string) => s.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g, "").toUpperCase();
-  const somenteLetras5 = (s: string) => /^[A-ZÀ-ÖØ-Þ]{5}$/.test(s);
+  const normaliza = (s) => s.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g, "").toUpperCase();
+  const somenteLetras5 = (s) => /^[A-ZÀ-ÖØ-Þ]{5}$/.test(s);
 
-  const mapFeedbackToRow = (fb: FeedbackItem[]): Celula[] =>
+  const mapFeedbackToRow = (fb) =>
     fb.slice(0, MAX_COLS).map((f) => ({ letra: f.letra?.toUpperCase() ?? "", status: f.status }));
 
   const placeholder = useMemo(() => {
@@ -69,7 +69,7 @@ export default function App() {
   // -------------------------------------------------------
   // API calls
   // -------------------------------------------------------
-  async function api(path: string, opts?: RequestInit) {
+  async function api(path, opts = {}) {
     const url = `${API_BASE}${path}`;
     const res = await fetch(url, {
       headers: { "Content-Type": "application/json" },
@@ -86,12 +86,12 @@ export default function App() {
     setCarregando(true);
     setErro("");
     try {
-      const est: EstadoJogo = await api("/iniciar", { method: "POST" });
+      const est = await api("/iniciar", { method: "POST" });
       setEstado(est);
       setLinhas([]);
       setLinhaAtual("");
       requestAnimationFrame(() => inputRef.current?.focus());
-    } catch (e: any) {
+    } catch (e) {
       setErro("Não foi possível iniciar o jogo. " + (e?.message ?? ""));
     } finally {
       setCarregando(false);
@@ -100,14 +100,14 @@ export default function App() {
 
   async function carregarEstado() {
     try {
-      const est: EstadoJogo = await api("/estado", { method: "GET" });
+      const est = await api("/estado", { method: "GET" });
       setEstado(est);
     } catch {
       // silencioso; a maioria dos backends devolve o estado já no /iniciar
     }
   }
 
-  async function enviarPalpite(palpite: string) {
+  async function enviarPalpite(palpite) {
     setCarregando(true);
     setErro("");
     try {
@@ -118,9 +118,9 @@ export default function App() {
       // resp esperado: { feedback, tentativas_restantes, status }
       const row = mapFeedbackToRow(resp.feedback || []);
       setLinhas((prev) => [...prev, row]);
-      setEstado((prev) => ({ ...(prev as EstadoJogo), ...resp }));
+      setEstado((prev) => ({ ...prev, ...resp }));
       setLinhaAtual("");
-    } catch (e: any) {
+    } catch (e) {
       setErro("Não foi possível enviar o palpite. " + (e?.message ?? ""));
     } finally {
       setCarregando(false);
@@ -132,11 +132,11 @@ export default function App() {
     setCarregando(true);
     setErro("");
     try {
-      const est: EstadoJogo = await api("/nova-partida", { method: "POST" });
+      const est = await api("/nova-partida", { method: "POST" });
       setEstado(est);
       setLinhas([]);
       setLinhaAtual("");
-    } catch (e: any) {
+    } catch (e) {
       setErro("Não foi possível iniciar nova partida. " + (e?.message ?? ""));
     } finally {
       setCarregando(false);
@@ -154,13 +154,13 @@ export default function App() {
   // -------------------------------------------------------
   // Handlers
   // -------------------------------------------------------
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (e) => {
     const value = normaliza(e.target.value).slice(0, MAX_COLS);
     setLinhaAtual(value);
     setErro("");
   };
 
-  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const onKeyDown = (e) => {
     if (!estado || estado.status !== "em_andamento") return;
     if (e.key === "Enter") {
       if (!somenteLetras5(linhaAtual)) {
@@ -176,7 +176,7 @@ export default function App() {
   // -------------------------------------------------------
   // UI helpers
   // -------------------------------------------------------
-  const classPorStatus = (s: Celula["status"]) => {
+  const classPorStatus = (s) => {
     switch (s) {
       case "correto":
         return "bg-green-600 text-white border-green-700";
@@ -197,9 +197,9 @@ export default function App() {
   }, [estado]);
 
   // cria “linhas vazias” para completar o grid visual com 6 tentativas
-  const linhasCompletas: Celula[][] = useMemo(() => {
+  const linhasCompletas = useMemo(() => {
     const faltam = Math.max(0, MAX_TENTATIVAS - linhas.length);
-    const vazia: Celula[] = Array.from({ length: MAX_COLS }, () => ({ letra: "", status: "vazia" }));
+    const vazia = Array.from({ length: MAX_COLS }, () => ({ letra: "", status: "vazia" }));
     return [...linhas, ...Array.from({ length: faltam }, () => vazia)];
   }, [linhas]);
 
@@ -208,12 +208,12 @@ export default function App() {
       <div className="w-full max-w-md">
         {/* Cabeçalho */}
         <header className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-wide">TERMO</h1>
-          <div className="text-xs opacity-80">Frontend SPA</div>
+          <h1 className="text-2xl font-bold tracking-wide">VOCAB</h1>
+          <div className="text-xs opacity-80">Jogo de Palavras</div>
         </header>
 
         {/* Grid de tentativas */}
-        <div className="grid grid-rows-6 gap-2 mb-4">
+        <div className="grid grid-rows-5 gap-2 mb-4">
           {linhasCompletas.map((row, rIdx) => (
             <div key={rIdx} className="grid grid-cols-5 gap-2">
               {row.map((cell, cIdx) => (

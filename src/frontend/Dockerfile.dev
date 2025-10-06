@@ -1,0 +1,23 @@
+# Dockerfile para desenvolvimento - compatível com Node.js 18
+FROM node:18-alpine
+
+# Configurar diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos de configuração primeiro para cache otimizado
+COPY package*.json ./
+COPY vite.config.js ./
+COPY tailwind.config.js ./
+COPY postcss.config.js ./
+
+# Instalar dependências
+RUN npm install
+
+# Copiar código fonte
+COPY . .
+
+# Expor porta do dev server
+EXPOSE 3000
+
+# Comando para desenvolvimento
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
