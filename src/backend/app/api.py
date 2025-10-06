@@ -42,7 +42,8 @@ def estado():
 
 @app.post("/api/palpite")
 def palpite(data: Palpite):
-    return game.analisar_palpite(data.palpite)
+    """Endpoint limpo: apenas recebe dados e delega para a lógica de negócio"""
+    return game.processar_palpite(data.palpite)
 
 @app.post("/api/nova-partida")
 def nova_partida():

@@ -32,7 +32,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const API_BASE = typeof window !== "undefined" && window.__TERMO_API__
   ? window.__TERMO_API__
-  : "/api"; // mude para o host do seu backend se necessário
+  : "http://localhost:8000"; // mude para o host do seu backend se necessário
 
 const MAX_COLS = 5;           // 5 letras por palavra
 const MAX_TENTATIVAS = 5;     // exibição (o backend devolve o valor real)
@@ -86,7 +86,7 @@ export default function App() {
     setCarregando(true);
     setErro("");
     try {
-      const est = await api("/iniciar", { method: "POST" });
+      const est = await api("/api/iniciar", { method: "POST" });
       setEstado(est);
       setLinhas([]);
       setLinhaAtual("");
@@ -100,7 +100,7 @@ export default function App() {
 
   async function carregarEstado() {
     try {
-      const est = await api("/estado", { method: "GET" });
+      const est = await api("/api/estado", { method: "GET" });
       setEstado(est);
     } catch {
       // silencioso; a maioria dos backends devolve o estado já no /iniciar
@@ -111,7 +111,7 @@ export default function App() {
     setCarregando(true);
     setErro("");
     try {
-      const resp = await api("/palpite", {
+      const resp = await api("/api/palpite", {
         method: "POST",
         body: JSON.stringify({ palpite }),
       });
@@ -132,7 +132,7 @@ export default function App() {
     setCarregando(true);
     setErro("");
     try {
-      const est = await api("/nova-partida", { method: "POST" });
+      const est = await api("/api/nova-partida", { method: "POST" });
       setEstado(est);
       setLinhas([]);
       setLinhaAtual("");

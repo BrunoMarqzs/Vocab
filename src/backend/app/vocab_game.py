@@ -147,6 +147,36 @@ class VocabGame:
                 resultado.append({'letra': letra, 'status': 'inexistente'})
         
         return resultado
+    
+    def processar_palpite(self, palpite):
+        """
+        Processa um palpite completo: analisa, atualiza estado, verifica fim de jogo.
+        Retorna o formato esperado pela API.
+        """
+        if self.status != 'em_andamento':
+            raise ValueError("O jogo não está em andamento")
+        
+        # Analisa o palpite
+        feedback = self.analisar_palpite(palpite)
+        
+        # Atualiza tentativas
+        self.tentativas_restantes -= 1
+        
+        # Adiciona ao tabuleiro
+        self.tabuleiro.append(feedback)
+        
+        # Verifica condições de fim de jogo
+        palpite_upper = palpite.upper()
+        if palpite_upper == self.palavra_secreta:
+            self.status = 'venceu'
+        elif self.tentativas_restantes <= 0:
+            self.status = 'perdeu'
+        
+        return {
+            "feedback": feedback,
+            "tentativas_restantes": self.tentativas_restantes,
+            "status": self.status
+        }
 
 
     def finalizar_jogo(self, palpite):
