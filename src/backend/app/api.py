@@ -1,16 +1,8 @@
-# api.py — FastAPI do TERMO (com CORS)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# ajuste o import conforme a sua estrutura
-try:
-    from vocab_game import VocabGame
-except ImportError:
-    try:
-        from src.vocab_game import VocabGame
-    except ImportError:
-        from backend.app.vocab_game import VocabGame  # se estiver dentro de src/backend/app
+from .vocab_game import VocabGame
 
 app = FastAPI()
 

@@ -40,15 +40,29 @@ cd src/frontend
 npm run dev
 ```
 
-### Opção 2: Usando Docker
+### Opção 2: Usando Docker (Simplificado)
 
 ```bash
-# Aplicação completa
-docker-compose up backend frontend-dev
+# Backend API (FastAPI) - Porta 8000
+docker-compose up backend
 
-# Apenas testes
-docker-compose run --rm vocab-tests
+# Frontend React (Vite) - Porta 3000
+docker-compose up frontend
+
+# Executar todos os testes (47 testes TDD)
+docker-compose run tests
+
+# Backend e frontend juntos
+docker-compose up backend frontend
+
+# Reconstruir se necessário
+docker-compose build
 ```
+
+**Estrutura Docker:**
+- 3 containers simplificados (backend, frontend, tests)
+- Configuração de desenvolvimento com hot-reload
+- Suite completa de TDD com 47 testes
 
 ## Acessar a Aplicação
 
@@ -83,21 +97,3 @@ PYTHONPATH=src python -m pytest src/backend/tests/test_uc_01.py -v
 - **Frontend**: React + Vite + Tailwind CSS
 - **Testes**: Pytest com metodologia TDD
 - **API Externa**: [Dicionário Aberto](https://dicionario-aberto.net/)
-
-## Troubleshooting
-
-### Problemas Comuns
-
-**Frontend mostra tela branca ou erros de conexão:**
-1. Certifique-se que o backend está rodando primeiro
-2. Use `127.0.0.1:8000` em vez de `localhost:8000` se houver problemas IPv6
-3. Verifique se as portas 8000 (backend) e 3000 (frontend) estão livres
-
-**Dependências não encontradas:**
-```bash
-# Se faltar uvicorn/fastapi
-pip install fastapi uvicorn requests
-
-# Se faltar dependências do Node.js  
-cd src/frontend && npm install
-```

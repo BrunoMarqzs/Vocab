@@ -1,15 +1,14 @@
-# Use Python 3.13 slim image as base
 FROM python:3.13-slim
-
-# Set working directory in container
-WORKDIR /app
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app:/app/src
 
-# Install system dependencies
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies (need gcc for some Python packages)
 RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
@@ -20,7 +19,7 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend source code
+# Copy all source code
 COPY . .
 
 # Create a non-root user for security
@@ -28,8 +27,5 @@ RUN useradd --create-home --shell /bin/bash app \
     && chown -R app:app /app
 USER app
 
-# Expose port
-EXPOSE 8000
-
-# Default command for running the API
-CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Command to run tests
+CMD ["python", "-m", "pytest", "src/backend/tests/", "-v"]
