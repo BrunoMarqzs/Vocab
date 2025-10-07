@@ -13,6 +13,9 @@ export default function App() {
   const [linhaAtual, setLinhaAtual] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [shareText, setShareText] = useState("");
+  const [copied, setCopied] = useState(false);
   const inputRef = useRef(null);
 
   // -------------------------------------------------------
@@ -174,6 +177,37 @@ export default function App() {
     return [...linhas, ...Array.from({ length: faltam }, () => vazia)];
   }, [linhas]);
 
+  // Função para converter linhas em quadradinhos
+  const emojiPorStatus = (status) => {
+    switch (status) {
+      case "correto": return "🟩";
+      case "posicao_errada": return "🟨";
+      case "inexistente": return "⬛";
+      default: return "⬛";
+    }
+  };
+
+  const gerarShareText = () => {
+    let texto = "Joguei vocab!\n";
+    for (const row of linhas) {
+      texto += row.map(cell => emojiPorStatus(cell.status)).join("") + "\n";
+    }
+    if (estado?.pontuacao !== undefined) {
+      texto += `Pontuação: ${estado.pontuacao}`;
+    }
+    return texto.trim();
+  };
+
+  const compartilhar = () => {
+    const texto = gerarShareText();
+    setShareText(texto);
+    setShowShare(true);
+    navigator.clipboard.writeText(texto).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -239,10 +273,10 @@ export default function App() {
             Nova partida
           </button>
           <button
-            onClick={iniciar}
-            className="ml-auto px-3 h-10 rounded-lg border border-neutral-700 hover:bg-neutral-900"
+            onClick={compartilhar}
+            className="ml-auto px-3 h-10 rounded-lg bg-neutral-800 hover:bg-neutral-700 active:bg-neutral-900 transition"
           >
-            Reiniciar
+            Compartilhar
           </button>
         </div>
 
@@ -281,6 +315,31 @@ export default function App() {
         <footer className="mt-4 text-xs opacity-60">
           Como jogar: use o teclado, digite 5 letras e pressione Enter.
         </footer>
+
+        {/* Modal de compartilhamento */}
+        {showShare && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-neutral-900 p-6 rounded-xl shadow-xl max-w-xs w-full text-center relative">
+              <button
+                className="absolute top-2 right-2 text-neutral-400 hover:text-neutral-200"
+                onClick={() => setShowShare(false)}
+              >✕</button>
+              <div className="mb-2 font-bold text-lg">Compartilhe seu resultado!</div>
+              <pre className="bg-neutral-800 rounded p-3 text-lg mb-2 whitespace-pre-wrap">{shareText}</pre>
+              <div className="text-green-400 mb-2" style={{ opacity: copied ? 1 : 0 }}>
+                Copiado!
+              </div>
+              <button
+                className="px-4 py-2 rounded bg-sky-600 hover:bg-sky-500 text-white"
+                onClick={() => {
+                  navigator.clipboard.writeText(shareText);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 1500);
+                }}
+              >Copiar novamente</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
