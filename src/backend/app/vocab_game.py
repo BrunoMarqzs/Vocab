@@ -190,11 +190,30 @@ class VocabGame:
             "status": self.status
         }
         
-        # Inclui palavra secreta quando o jogo termina (perdeu ou venceu)
+        # Inclui palavra secreta e pontuação quando o jogo termina (perdeu ou venceu)
         if self.status in ['venceu', 'perdeu']:
             resposta["palavra_secreta"] = self.palavra_secreta
+            resposta["pontuacao"] = self.calcular_pontuacao()
         
         return resposta
+    
+    def calcular_pontuacao(self):
+        # Calcula a pontuação baseada no número de letras corretas na posição certa da última tentativa.
+        if not self.tabuleiro:
+            return 0
+        
+        # Pega a última tentativa (feedback)
+        ultima_tentativa = self.tabuleiro[-1]
+        
+        # Conta quantas letras estão na posição correta
+        letras_corretas = 0
+        for item in ultima_tentativa:
+            if item['status'] == 'correto':
+                letras_corretas += 1
+        
+        # 20 pontos por letra correta
+        pontuacao = letras_corretas * 20
+        return pontuacao
 
 
     def finalizar_jogo(self, palpite):

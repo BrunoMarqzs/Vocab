@@ -1,46 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-/**
- * VOCAB — Frontend SPA
- * -------------------------------------------------------
- * ✔ Single-file React componen  //   // cria "linhas vazias" para completar o grid visual com 5 tentativasria "linhas vazias" para completar o grid visual com 5 tentativas
-  const linhasCompletas = useMemo(() => {
-    const faltam = Math.max(0, MAX_TENTATIVAS - linhas.length);
-    const vazia = Array.from({ length: MAX_COLS }, () => ({ letra: "", status: "vazia" }));
-    return [...linhas, ...Array.from({ length: faltam }, () => vazia)];
-  }, [linhas]);.jsx)
- * ✔ Tailwind-only styling (no external UI libs)
- * ✔ Clean, keyboard-friendly UX (Enter/Backspace)
- * ✔ Works against a minimal REST API (spec below)
- * ✔ Graceful fallback messages & validations (5 letras A–Z)
- *
- * API EXPECTED (adapte ao seu backend Python):
- *   POST   /api/iniciar                 -> { tentativas_restantes:number, tabuleiro:[], status:"em_andamento" }
- *   GET    /api/estado                  -> { tentativas_restantes:number, tabuleiro:[Row], status:string }
- *   POST   /api/palpite { palpite }     -> {
- *                                           feedback: Array<{ letra:string, status:"correto"|"posicao_errada"|"inexistente" }>,
- *                                           tentativas_restantes:number,
- *                                           status:"em_andamento"|"venceu"|"perdeu"
- *                                         }
- *   POST   /api/nova-partida            -> { ...mesmo shape de /api/iniciar }
- *
- * Onde `tabuleiro` pode ser um array de arrays já avaliados (opcional). O frontend não depende disso; ele desenha
- * com base no que chega de `feedback` a cada palpite.
- *
- * Se quiser, você pode trocar o API_BASE para apontar pro seu backend local (ex.: http://localhost:8000).
- */
-
 const API_BASE = typeof window !== "undefined" && window.__TERMO_API__
   ? window.__TERMO_API__
-  : "http://localhost:8000"; // mude para o host do seu backend se necessário
+  : "http://localhost:8000";
 
-const MAX_COLS = 5;           // 5 letras por palavra
-const MAX_TENTATIVAS = 5;     // exibição (o backend devolve o valor real)
-
-// Tipos para referência (remover se usar JSDoc):
-// Celula = { letra: string; status: "correto" | "posicao_errada" | "inexistente" | "vazia" }
-// FeedbackItem = { letra: string; status: "correto" | "posicao_errada" | "inexistente" }
-// EstadoJogo = { tentativas_restantes: number; tabuleiro: FeedbackItem[][] | [], status: string }
+const MAX_COLS = 5;
+const MAX_TENTATIVAS = 5;
 
 export default function App() {
   const [estado, setEstado] = useState(null);
@@ -103,7 +68,6 @@ export default function App() {
       const est = await api("/api/estado", { method: "GET" });
       setEstado(est);
     } catch {
-      // silencioso; a maioria dos backends devolve o estado já no /iniciar
     }
   }
 
@@ -115,7 +79,6 @@ export default function App() {
         method: "POST",
         body: JSON.stringify({ palpite }),
       });
-      // resp esperado: { feedback, tentativas_restantes, status }
       const row = mapFeedbackToRow(resp.feedback || []);
       setLinhas((prev) => [...prev, row]);
       setEstado((prev) => ({ ...prev, ...resp }));
@@ -192,19 +155,19 @@ export default function App() {
   const statusMensagem = useMemo(() => {
     if (!estado) return "";
     if (estado.status === "venceu") {
-      return estado.palavra_secreta 
-        ? `🎉 Você acertou! A palavra era: ${estado.palavra_secreta}`
-        : "🎉 Você acertou!";
+      const palavraTexto = estado.palavra_secreta ? `A palavra era: ${estado.palavra_secreta}` : "";
+      const pontuacaoTexto = estado.pontuacao !== undefined ? ` | Pontuação: ${estado.pontuacao}` : "";
+      return `🎉 Você acertou! ${palavraTexto}${pontuacaoTexto}`;
     }
     if (estado.status === "perdeu") {
-      return estado.palavra_secreta 
-        ? `💀 Fim de jogo. A palavra era: ${estado.palavra_secreta}`
-        : "💀 Fim de jogo. Tente outra vez.";
+      const palavraTexto = estado.palavra_secreta ? `A palavra era: ${estado.palavra_secreta}` : "Tente outra vez.";
+      const pontuacaoTexto = estado.pontuacao !== undefined ? ` | Pontuação: ${estado.pontuacao}` : "";
+      return `💀 Fim de jogo. ${palavraTexto}${pontuacaoTexto}`;
     }
     return `Tentativas restantes: ${estado.tentativas_restantes ?? "-"}`;
   }, [estado]);
 
-  // cria “linhas vazias” para completar o grid visual com 6 tentativas
+  // cria “linhas vazias” para completar o grid visual com 5 tentativas
   const linhasCompletas = useMemo(() => {
     const faltam = Math.max(0, MAX_TENTATIVAS - linhas.length);
     const vazia = Array.from({ length: MAX_COLS }, () => ({ letra: "", status: "vazia" }));
@@ -283,8 +246,31 @@ export default function App() {
           </button>
         </div>
 
+        {/* Resultado Final (quando jogo termina) */}
+        {estado && (estado.status === "venceu" || estado.status === "perdeu") && (
+          <div className={`mb-4 p-4 rounded-xl border-2 text-center ${
+            estado.status === "venceu" 
+              ? "bg-green-900/30 border-green-600 text-green-100" 
+              : "bg-red-900/30 border-red-600 text-red-100"
+          }`}>
+            <div className="text-lg font-bold mb-2">
+              {estado.status === "venceu" ? "🎉 PARABÉNS!" : "💀 QUE PENA!"}
+            </div>
+            {estado.palavra_secreta && (
+              <div className="text-base mb-2 font-mono tracking-wider">
+                A palavra era: <span className="font-bold text-yellow-300">{estado.palavra_secreta}</span>
+              </div>
+            )}
+            {estado.pontuacao !== undefined && (
+              <div className="text-xl font-bold">
+                Pontuação: <span className="text-yellow-300">{estado.pontuacao}</span> pontos
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Mensagens */}
-        {statusMensagem && (
+        {statusMensagem && !(estado && (estado.status === "venceu" || estado.status === "perdeu")) && (
           <div className="text-sm mb-1 opacity-90">{statusMensagem}</div>
         )}
         {erro && (
@@ -293,7 +279,7 @@ export default function App() {
 
         {/* Rodapé */}
         <footer className="mt-4 text-xs opacity-60">
-          Dica: use o teclado — digite 5 letras e pressione Enter. Backspace edita.
+          Como jogar: use o teclado, digite 5 letras e pressione Enter.
         </footer>
       </div>
     </div>
