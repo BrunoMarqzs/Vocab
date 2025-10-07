@@ -1,6 +1,7 @@
 import requests
 import random
 import time
+import unicodedata
 
 
 class VocabGame:    
@@ -93,6 +94,10 @@ class VocabGame:
         
         return True
 
+    def remover_acentos(self, s):
+        return ''.join(c for c in unicodedata.normalize('NFD', s)
+                       if unicodedata.category(c) != 'Mn')
+
     def inserir_tentativa(self, palavra):
         """ UC-02 - Inserir tentativa completa no jogo """
         # 0. Verificar se o jogo foi iniciado
@@ -106,9 +111,11 @@ class VocabGame:
             else:
                 return {'acertou': False, 'erro': 'Palavra deve conter apenas letras'}
         
-        # 2. Verificar se acertou a palavra
+        # 2. Verificar se acertou a palavra (normalizando acentos)
         palavra = palavra.upper()
-        acertou = palavra == self.palavra_secreta
+        palavra_normalizada = self.remover_acentos(palavra)
+        secreta_normalizada = self.remover_acentos(self.palavra_secreta)
+        acertou = palavra_normalizada == secreta_normalizada
         
         # 3. Processar tentativa
         feedback = self.analisar_palpite(palavra)
@@ -147,16 +154,19 @@ class VocabGame:
         # UC-03: Receber Feedback da Tentativa
         palpite = palpite.upper()
         resultado = []
-    
+        palavra_secreta_normalizada = self.remover_acentos(self.palavra_secreta)
+        palpite_normalizado = self.remover_acentos(palpite)
         for i in range(5):
-            letra = palpite[i]
-            if letra == self.palavra_secreta[i]:
-                resultado.append({'letra': letra, 'status': 'correto'})
-            elif letra in self.palavra_secreta:
-                resultado.append({'letra': letra, 'status': 'posicao_errada'})
+            letra_palpite = palpite[i]
+            letra_palpite_norm = palpite_normalizado[i]
+            letra_secreta = self.palavra_secreta[i]
+            letra_secreta_norm = palavra_secreta_normalizada[i]
+            if letra_palpite_norm == letra_secreta_norm:
+                resultado.append({'letra': letra_palpite, 'status': 'correto'})
+            elif letra_palpite_norm in palavra_secreta_normalizada:
+                resultado.append({'letra': letra_palpite, 'status': 'posicao_errada'})
             else:
-                resultado.append({'letra': letra, 'status': 'inexistente'})
-        
+                resultado.append({'letra': letra_palpite, 'status': 'inexistente'})
         return resultado
     
     def processar_palpite(self, palpite):
